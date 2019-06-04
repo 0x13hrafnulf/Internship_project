@@ -141,9 +141,10 @@ centroids = []
             marker = ['+','o','*','.','x','s','d','^','v','>','<','p','h'];
             for i = 1:number_of_clusters
                 check = labels == i;
-                col = colors(i,:); 
+                col = colors(i,:);
+                col2 = colors(number_of_clusters + 1 - i,:)
                 index = 1 + mod(i, 13);
-                scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col);
+                scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
                 hold(ax2, 'on');
             end
             hold(ax2, 'off');
