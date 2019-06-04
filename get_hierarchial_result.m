@@ -1,3 +1,3 @@
-function [p1, p2] =  get_hierarchial_result(filename, n)
+function label =  get_hierarchial_result(input_matrix, n)
 
 end

@@ -1,3 +1,3 @@
-function [p1, p2] = get_dbscan_result(filename, n)
+function label = get_dbscan_result(input_matrix, n)
 
 end
