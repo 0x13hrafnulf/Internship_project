@@ -16,14 +16,50 @@ save_method_chosen1 = uicontrol('Style', 'popupmenu', 'String', {'Output graph',
 save_method_chosen2 = uicontrol('Style', 'popupmenu', 'String', {'Binary (.mat)', 'Text (.txt)'}, 'Units', 'Normalized', ...
         'FontAngle','italic','FontSize' , 12 ,'Position', [0.84, 0.81, 0.1, 0.08]);
 
-uicontrol('Style', 'text', 'String', 'Number of clusters', 'Units', 'Normalized', ...
-        'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.73, 0.65, 0.21, 0.05]);
+cluster_num_s = uicontrol('Style', 'text', 'String', 'Number of clusters', 'Units', 'Normalized', ...
+        'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.73, 0.65, 0.21, 0.05], 'Visible', 'on');
 cluster_num_edt = uicontrol('Style', 'edit', 'String', 'Enter the number of clusters', 'Units', 'Normalized', ...
-        'FontAngle','italic','FontSize' , 11,'Position', [0.73, 0.62, 0.21, 0.05]);
+        'FontAngle','italic','FontSize' , 10,'Position', [0.73, 0.62, 0.21, 0.05], 'Visible', 'on');
 uicontrol('Style', 'text', 'String', 'Clustering method', 'Units', 'Normalized', ...
         'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.73, 0.73, 0.21, 0.05]);
-cluster_method_chosen = uicontrol('Style', 'popupmenu', 'String', {'DBSCAN', 'K-Means', 'GMM-clusters', 'Hierarchial'}, 'Units', 'Normalized', ...
-        'FontWeight','bold','FontAngle','italic','FontSize' , 11,'Position', [0.73, 0.7, 0.21, 0.05]);
+cluster_method_chosen = uicontrol('Style', 'popupmenu', 'String', { 'K-Means', 'DBSCAN', 'GMM-clusters', 'Hierarchial'}, 'Units', 'Normalized', ...
+        'FontWeight','bold','FontAngle','italic','FontSize' , 11,'Position', [0.73, 0.7, 0.21, 0.05], 'Callback', @m_chosen);
+%DBSCAN specific
+dbscan_s = uicontrol('Style', 'text', 'String', 'DBSCAN properties', 'Units', 'Normalized', ...
+        'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.73, 0.48, 0.21, 0.05], 'Visible', 'off');
+dbscan_s1 = uicontrol('Style', 'text', 'String', 'Epsilon (radius)', 'Units', 'Normalized', ...
+        'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.73, 0.45, 0.21, 0.05], 'Visible', 'off');
+epsilon =  uicontrol('Style', 'edit', 'String', 'Enter the value of epsilon', 'Units', 'Normalized', ...
+        'FontAngle','italic','FontSize' , 10,'Position', [0.73, 0.42, 0.21, 0.05], 'Visible', 'off');
+dbscan_s2 = uicontrol('Style', 'text', 'String', 'Number of neighbours', 'Units', 'Normalized', ...
+        'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.73, 0.35, 0.21, 0.05], 'Visible', 'off');
+min_neigh =  uicontrol('Style', 'edit', 'String', 'Enter the number of neighbours', 'Units', 'Normalized', ...
+        'FontAngle','italic','FontSize' , 10,'Position', [0.73, 0.32, 0.21, 0.05], 'Visible', 'off');
+%
+
+    function m_chosen(src, event)
+        s_method = get(cluster_method_chosen, 'String');
+        s_value = get(cluster_method_chosen, 'Value');
+        cla(ax2,'reset');
+        if (strcmp(s_method{s_value}, 'DBSCAN'))
+            set(dbscan_s, 'Visible', 'on');
+            set(dbscan_s1, 'Visible', 'on');
+            set(dbscan_s2, 'Visible', 'on');
+            set(epsilon, 'Visible', 'on');
+            set(min_neigh, 'Visible', 'on');
+            set(cluster_num_edt, 'Visible', 'off');
+            set(cluster_num_s, 'Visible', 'off');
+            
+        else
+            set(dbscan_s, 'Visible', 'off');
+            set(dbscan_s1, 'Visible', 'off');
+            set(dbscan_s2, 'Visible', 'off');
+            set(epsilon, 'Visible', 'off');
+            set(min_neigh, 'Visible', 'off');
+            set(cluster_num_edt, 'Visible', 'on');
+            set(cluster_num_s, 'Visible', 'on');
+        end
+    end
     
 ax1 = axes('Units', 'Normalized', 'Position', [0.05, 0.57, 0.6, 0.40]);
 title('Initial Graph','FontWeight','bold')
@@ -110,44 +146,68 @@ filename_for_saving = [];
 output_matrix = []
 labels = []
 colors = []
-centroids = []
-    function calculate(src,event) 
+%centroids = []
+    function calculate(src,event)
+        cla(ax2,'reset');
         method = get(cluster_method_chosen, 'String');
         value = get(cluster_method_chosen, 'Value');
         number_of_clusters = get(cluster_num_edt, 'String');
-        if(strcmp(number_of_clusters, 'Enter the number of clusters'))
+        number_of_neighbours = get(min_neigh, 'String');
+        eps = get(epsilon, 'String');
+        if(strcmp(number_of_clusters, 'Enter the number of clusters') & strcmp(method{value}, 'DBSCAN') == 0)
             msgbox('Please enter the number of clusters.', 'Error','error')
         else
             number_of_clusters = str2num(number_of_clusters);
             switch method{value} %kmeans, clusterdata and dendrogram, cluster 
             case 'DBSCAN'
-                msgbox('DBSCAN clusterization')
-               
-                %label = get_dbscan_result(input_matrix, number_of_clusters)
+                if(strcmp(number_of_neighbours, 'Enter the number of neighbours') | strcmp(eps, 'Enter the value of epsilon'))
+                    msgbox('Please enter the values of epsilon and neighbours', 'Error','error')
+                else
+                    msgbox('DBSCAN clusterization')
+                    number_of_neighbours = str2double(number_of_neighbours);
+                    eps = str2double(eps);
+                    [labels, colors] = get_dbscan_result(input_matrix, eps, number_of_neighbours);
+                end 
             case 'K-Means'
                  msgbox('K-Means clusterization')
                 
-                 [labels, colors] = get_k_means_result(input_matrix, number_of_clusters)   
+                 [labels, colors] = get_k_means_result(input_matrix, number_of_clusters);
             case 'GMM-clusters'
                  msgbox('GMM clusterization')
                  
-                 %label = get_gmm_result(input_matrix, number_of_clusters)
+                 [labels, colors] = get_gmm_result(input_matrix, number_of_clusters)
             case 'Hierarchial'
                  msgbox('Hierarchial clusterization')
                  
-                 %label = get_hierarchial_result(input_matrix, number_of_clusters)
+                 [labels, colors] = get_hierarchial_result(input_matrix, number_of_clusters)
             end
             output_matrix = [input_matrix, labels];
-            marker = ['+','o','*','.','x','s','d','^','v','>','<','p','h'];
-            for i = 1:number_of_clusters
-                check = labels == i;
-                col = colors(i,:);
-                col2 = colors(number_of_clusters + 1 - i,:)
-                index = 1 + mod(i, 13);
-                scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
-                hold(ax2, 'on');
+            n = max(labels);
+            if(strcmp(method{value}, 'DBSCAN'))
+                marker = ['+','o','*','.','s','d','^','v','>','<','p','h'];
+                
+                for i = 1:n
+                    check = labels == i;
+                    col = colors(i,:);
+                    col2 = colors(n + 1 - i,:)
+                    index = 1 + mod(i, 12);
+                    scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
+                    hold(ax2, 'on');
+                    
+                end
+            else
+                marker = ['+','o','*','.','x','s','d','^','v','>','<','p','h'];
+                for i = 1:number_of_clusters
+                    check = labels == i;
+                    col = colors(i,:);
+                    col2 = colors(number_of_clusters + 1 - i,:)
+                    index = 1 + mod(i, 13);
+                    scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
+                    hold(ax2, 'on');
+                end
             end
-            hold(ax2, 'off');
-        end
+            scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r')
+            hold(ax2, 'on');
+        end        
     end
 end
