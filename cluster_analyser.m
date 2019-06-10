@@ -12,7 +12,7 @@ uicontrol('Style', 'pushbutton', 'String', 'Save file as', 'Units', 'Normalized'
         'Position', [0.73, 0.85, 0.11, 0.05], 'FontWeight', 'bold' ,'FontSize' , 11, 'Callback', @save_file);
 uicontrol('Style', 'pushbutton', 'String', 'Save graph as', 'Units', 'Normalized', ...
         'Position', [0.73, 0.8, 0.11, 0.05], 'FontWeight', 'bold' ,'FontSize' , 11,'Callback', @save_graph);
-save_method_chosen1 = uicontrol('Style', 'popupmenu', 'String', {'Output graph', 'Both graphs'}, 'Units', 'Normalized', ...
+save_method_chosen1 = uicontrol('Style', 'popupmenu', 'String', {'Output graph','Input graph', 'Both graphs'}, 'Units', 'Normalized', ...
         'FontAngle','italic','FontSize' , 12 ,'Position', [0.84, 0.76, 0.1, 0.08]);
 save_method_chosen2 = uicontrol('Style', 'popupmenu', 'String', {'Binary (.mat)', 'Text (.txt)'}, 'Units', 'Normalized', ...
         'FontAngle','italic','FontSize' , 12 ,'Position', [0.84, 0.81, 0.1, 0.08]);
@@ -151,8 +151,15 @@ filename_for_saving = [];
             print(graphName,'-dpng','-noui');
         elseif(strcmp(save_selected,'Output graph'))
             f_new = figure('Visible', 'off');
-            fig.InvertHardcopy = 'off';
+            f_new.InvertHardcopy = 'off';
             ax_new = copyobj(ax2, f_new);
+            set(ax_new,'Position','default');
+            print(f_new, graphName,'-dpng');
+            close(f_new);
+        elseif(strcmp(save_selected,'Input graph'))
+            f_new = figure('Visible', 'off');
+            f_new.InvertHardcopy = 'off';
+            ax_new = copyobj(ax1, f_new);
             set(ax_new,'Position','default');
             print(f_new, graphName,'-dpng');
             close(f_new);
