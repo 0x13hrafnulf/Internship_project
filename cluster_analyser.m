@@ -1,7 +1,8 @@
 function cluster_analyser
 
 main_window = figure('Name', 'Cluster Analyser', 'Units', 'Normalized', 'Position', [0, 0, 0.8, 0.8], 'Visible', 'off', 'MenuBar', 'none');
-zoom on;
+%zoom on;
+%pan on;
 
 uicontrol('Style', 'pushbutton', 'String', 'Calculate', 'Units', 'Normalized', ...
         'Position', [0.73, 0.55, 0.21, 0.05], 'FontWeight', 'bold' ,'FontSize' , 12, 'Callback', @calculate);
@@ -65,10 +66,16 @@ ax1 = axes('Units', 'Normalized', 'Position', [0.05, 0.57, 0.6, 0.40]);
 title('Initial Graph','FontWeight','bold')
 ylabel('P2','FontSize',10);
 xlabel('P1','FontSize',10);
+tb1 = axtoolbar(ax1,'default');
+tb1.Visible = 'on';
+
 ax2 = axes('Units', 'Normalized', 'Position', [0.05, 0.07, 0.6, 0.40]);   
 title('Output Graph','FontWeight','bold')
 ylabel('P2','FontSize',10);
 xlabel('P1','FontSize',10);
+tb2 = axtoolbar(ax2,'default');
+tb2.Visible = 'on';
+
 
 movegui(main_window, 'center');
 set(main_window, 'Visible', 'on');
@@ -82,7 +89,12 @@ filename_for_saving = [];
         filename_for_saving = filename;
         match = [".txt", ".mat"];
         filename_for_saving = erase(filename_for_saving,match);
-        input_matrix = load(full_filename);
+        if(contains(filename, match(1)))
+            input_matrix = load(full_filename);
+        elseif(contains(filename, match(2)))
+            input_matrix = load(full_filename);
+            input_matrix = input_matrix.D; %specify matrix name that being loaded from file 
+        end
         scatter(ax1, input_matrix(:,1), input_matrix(:,2), 'filled');
     end
     function save_file(src, event)
@@ -90,8 +102,12 @@ filename_for_saving = [];
         method = get(cluster_method_chosen, 'String');
         value = get(cluster_method_chosen, 'Value');
         number_of_clusters = get(cluster_num_edt, 'String');
-        if(strcmp(number_of_clusters,'Enter the number of clusters'))
+        number_of_neighbours = get(min_neigh, 'String');
+        eps = get(epsilon, 'String');
+        if(strcmp(number_of_clusters,'Enter the number of clusters') & ~strcmp(method{value}, 'DBSCAN'))
             number_of_clusters = 'Null';
+        elseif(strcmp(method{value}, 'DBSCAN'))
+            number_of_clusters = strcat('eps_', eps, '_neighbours_', number_of_neighbours);
         end
         
         items = get(save_method_chosen2,'String');
@@ -99,29 +115,31 @@ filename_for_saving = [];
         save_selected = items{index_selected};
         fileName = []
         if(strcmp(save_selected, 'Text (.txt)'))
-            fileName = strcat(filename_for_saving,'_',method{value},'_Nclusters=',number_of_clusters,'_',current_date, '.txt');
+            fileName = strcat(filename_for_saving,'_',method{value},'_params:',number_of_clusters,'_',current_date, '.txt');
             dlmwrite(fileName, output_matrix, 'delimiter', ' ');
         elseif(strcmp(save_selected,'Binary (.mat)'))
-            fileName = strcat(filename_for_saving, '_', method{value},'_Nclusters=',number_of_clusters,'_',current_date, '.mat');
-            save(fileName, 'output_matrix');
+            fileName = strcat(filename_for_saving, '_', method{value},'_params:',number_of_clusters,'_',current_date, '.mat');
+            X = output_matrix;
+            save(fileName, 'X');
         end
         
         msgbox({'Your file was saved:'; fileName}, 'Success');
-        %uiputfile
-        %save
-        %uisave
-        %write, fwrite, export
-        %use table container, readtable
+       
     end
     function save_graph(src, event)
         current_date = date;
         method = get(cluster_method_chosen, 'String');
         value = get(cluster_method_chosen, 'Value');
         number_of_clusters = get(cluster_num_edt, 'String');
-        if(strcmp(number_of_clusters,'Enter the number of clusters'))
-            number_of_clusters = 'Null';
+        number_of_neighbours = get(min_neigh, 'String');
+        eps = get(epsilon, 'String');
+        if(strcmp(number_of_clusters,'Enter the number of clusters') & ~strcmp(method{value}, 'DBSCAN'))
+           number_of_clusters = 'Null';
+        elseif(strcmp(method{value}, 'DBSCAN'))
+            number_of_clusters = strcat('eps_', eps, '_neighbours_', number_of_neighbours);
         end
-        graphName = strcat(filename_for_saving, '_', method{value},'_Nclusters=',number_of_clusters,'_',current_date);
+        
+        graphName = strcat(filename_for_saving, '_', method{value},'_params:',number_of_clusters,'_',current_date);
         
         items = get(save_method_chosen1,'String');
         index_selected = get(save_method_chosen1,'Value');
@@ -188,8 +206,9 @@ colors = []
                 
                 for i = 1:n
                     check = labels == i;
-                    col = colors(i,:);
-                    col2 = colors(n + 1 - i,:)
+                    indexcol = 1 + mod(i, 8);
+                    col = colors(indexcol,:);
+                    col2 = colors(8 - indexcol + 1,:)
                     index = 1 + mod(i, 12);
                     scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
                     hold(ax2, 'on');
@@ -199,8 +218,9 @@ colors = []
                 marker = ['+','o','*','.','x','s','d','^','v','>','<','p','h'];
                 for i = 1:number_of_clusters
                     check = labels == i;
-                    col = colors(i,:);
-                    col2 = colors(number_of_clusters + 1 - i,:)
+                    indexcol = 1 + mod(i, 8);
+                    col = colors(indexcol,:);
+                    col2 = colors(8 - indexcol + 1,:)
                     index = 1 + mod(i, 13);
                     scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
                     hold(ax2, 'on');

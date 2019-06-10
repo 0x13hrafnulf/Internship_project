@@ -1,14 +1,13 @@
 function [labels, colors] = get_dbscan_result(input_matrix, eps,  n_neigh)
     
     labels = dbscan(input_matrix, eps, n_neigh);
-    n = max(labels);
-    colors = zeros(n, 3);
+    colors = zeros(8, 3);
 
-    for i = 1:n
+    for i = 1:8
         colors(i,:) = i;
     end
 
-    ratio = 1/n;
+    ratio = 1/8;
     %create some random color generation
     colors = colors * ratio;
 
