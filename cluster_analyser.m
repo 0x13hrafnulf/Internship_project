@@ -148,12 +148,14 @@ filename_for_saving = [];
         if(strcmp(save_selected, 'Both graphs'))
             fig = main_window;
             fig.InvertHardcopy = 'off';
+            graphName = strcat(graphName,'_', save_selected);
             print(graphName,'-dpng','-noui');
         elseif(strcmp(save_selected,'Output graph'))
             f_new = figure('Visible', 'off');
             f_new.InvertHardcopy = 'off';
             ax_new = copyobj(ax2, f_new);
             set(ax_new,'Position','default');
+            graphName = strcat(graphName,'_', save_selected);
             print(f_new, graphName,'-dpng');
             close(f_new);
         elseif(strcmp(save_selected,'Input graph'))
@@ -161,6 +163,7 @@ filename_for_saving = [];
             f_new.InvertHardcopy = 'off';
             ax_new = copyobj(ax1, f_new);
             set(ax_new,'Position','default');
+            graphName = strcat(graphName,'_', save_selected);
             print(f_new, graphName,'-dpng');
             close(f_new);
         end
@@ -188,21 +191,21 @@ colors = [];
                 if(strcmp(number_of_neighbours, 'Enter the number of neighbours') | strcmp(eps, 'Enter the value of epsilon'))
                     msgbox('Please enter the values of epsilon and neighbours', 'Error','error');
                 else
-                    msgbox('DBSCAN clusterization');
+                    
                     number_of_neighbours = str2double(number_of_neighbours);
                     eps = str2double(eps);
                     [labels, colors] = get_dbscan_result(input_matrix, eps, number_of_neighbours);
                 end 
             case 'K-Means'
-                 msgbox('K-Means clusterization');
+                 
                 
                  [labels, colors] = get_k_means_result(input_matrix, number_of_clusters);
             case 'GMM-clusters'
-                 msgbox('GMM clusterization');
+                 
                  
                  [labels, colors] = get_gmm_result(input_matrix, number_of_clusters);
             case 'Hierarchial'
-                 msgbox('Hierarchial clusterization');
+                 
                  
                  [labels, colors] = get_hierarchial_result(input_matrix, number_of_clusters);
             end
