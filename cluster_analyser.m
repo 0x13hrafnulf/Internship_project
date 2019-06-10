@@ -1,6 +1,6 @@
 function cluster_analyser
 
-main_window = figure('Name', 'Cluster Analyser', 'Units', 'Normalized', 'Position', [0, 0, 0.8, 0.8], 'Visible', 'off', 'MenuBar', 'none');
+main_window = figure('Name', 'Cluster Analyser', 'Units', 'Normalized', 'Position', [0, 0, 0.8, 0.8], 'Visible', 'off', 'MenuBar', 'none', 'Resize', 'on');
 %zoom on;
 %pan on;
 
