@@ -30,11 +30,11 @@ function [labels, colors] = get_dbscan_result(input_matrix, eps,  n_neigh)
     
     
         for i=1:n
-            if ~checked(i)
+            if (~checked(i))
                 checked(i) = true;
             
                 neighbours = RegionQuery(i); %check neighbors
-                if numel(neighbours) < MinPts %check whether number of neighbors fits the specified number of neighbors
+                if (numel(neighbours) < MinPts) %check whether number of neighbors fits the specified number of neighbors
                     idx(i) = 0;%means that matrix[i] is noise
                 else
                     cluster_n = cluster_n + 1; %new label
@@ -50,19 +50,19 @@ function [labels, colors] = get_dbscan_result(input_matrix, eps,  n_neigh)
             while true
                 j = neighbours(k);
             
-                if ~checked(j)
+                if (~checked(j))
                     checked(j) = true;
                     neighbours_temp = RegionQuery(j);
-                    if numel(neighbours_temp) >= MinPts
+                    if (numel(neighbours_temp) >= MinPts)
                         neighbours = [neighbours, neighbours_temp];   %append the new found neighbors
                     end
                 end
-                if idx(j) == 0
+                if (idx(j) == 0)
                     idx(j) = cluster_n;
                 end
             
                 k = k + 1;
-                if k > numel(neighbours) %break if no more neighbors to check
+                if (k > numel(neighbours)) %break if no more neighbors to check
                     break;
                 end
             end

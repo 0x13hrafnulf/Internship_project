@@ -63,14 +63,14 @@ min_neigh =  uicontrol('Style', 'edit', 'String', 'Enter the number of neighbour
     end
     
 ax1 = axes('Units', 'Normalized', 'Position', [0.05, 0.57, 0.6, 0.40]);
-title('Initial Graph','FontWeight','bold')
+title('Initial Graph','FontWeight','bold');
 ylabel('P2','FontSize',10);
 xlabel('P1','FontSize',10);
 tb1 = axtoolbar(ax1,'default');
 tb1.Visible = 'on';
 
 ax2 = axes('Units', 'Normalized', 'Position', [0.05, 0.07, 0.6, 0.40]);   
-title('Output Graph','FontWeight','bold')
+title('Output Graph','FontWeight','bold');
 ylabel('P2','FontSize',10);
 xlabel('P1','FontSize',10);
 tb2 = axtoolbar(ax2,'default');
@@ -115,10 +115,10 @@ filename_for_saving = [];
         save_selected = items{index_selected};
         fileName = []
         if(strcmp(save_selected, 'Text (.txt)'))
-            fileName = strcat(filename_for_saving,'_',method{value},'_params:',number_of_clusters,'_',current_date, '.txt');
+            fileName = strcat(filename_for_saving,'_',method{value},'_params:',number_of_clusters,'_date:',current_date, '.txt');
             dlmwrite(fileName, output_matrix, 'delimiter', ' ');
         elseif(strcmp(save_selected,'Binary (.mat)'))
-            fileName = strcat(filename_for_saving, '_', method{value},'_params:',number_of_clusters,'_',current_date, '.mat');
+            fileName = strcat(filename_for_saving, '_', method{value},'_params:',number_of_clusters,'_date:',current_date, '.mat');
             X = output_matrix;
             save(fileName, 'X');
         end
@@ -139,7 +139,7 @@ filename_for_saving = [];
             number_of_clusters = strcat('eps_', eps, '_neighbours_', number_of_neighbours);
         end
         
-        graphName = strcat(filename_for_saving, '_', method{value},'_params:',number_of_clusters,'_',current_date);
+        graphName = strcat(filename_for_saving, '_', method{value},'_params:',number_of_clusters,'_date:',current_date);
         
         items = get(save_method_chosen1,'String');
         index_selected = get(save_method_chosen1,'Value');
@@ -161,10 +161,10 @@ filename_for_saving = [];
         msgbox({'Your graph was saved:'; graphName}, 'Success');
     end 
 
-output_matrix = []
-labels = []
-colors = []
-%centroids = []
+output_matrix = [];
+labels = [];
+colors = [];
+%centroids = [];
     function calculate(src,event)
         cla(ax2,'reset');
         method = get(cluster_method_chosen, 'String');
@@ -173,31 +173,31 @@ colors = []
         number_of_neighbours = get(min_neigh, 'String');
         eps = get(epsilon, 'String');
         if(strcmp(number_of_clusters, 'Enter the number of clusters') & strcmp(method{value}, 'DBSCAN') == 0)
-            msgbox('Please enter the number of clusters.', 'Error','error')
+            msgbox('Please enter the number of clusters.', 'Error','error');
         else
             number_of_clusters = str2num(number_of_clusters);
             switch method{value} %kmeans, clusterdata and dendrogram, cluster 
             case 'DBSCAN'
                 if(strcmp(number_of_neighbours, 'Enter the number of neighbours') | strcmp(eps, 'Enter the value of epsilon'))
-                    msgbox('Please enter the values of epsilon and neighbours', 'Error','error')
+                    msgbox('Please enter the values of epsilon and neighbours', 'Error','error');
                 else
-                    msgbox('DBSCAN clusterization')
+                    msgbox('DBSCAN clusterization');
                     number_of_neighbours = str2double(number_of_neighbours);
                     eps = str2double(eps);
                     [labels, colors] = get_dbscan_result(input_matrix, eps, number_of_neighbours);
                 end 
             case 'K-Means'
-                 msgbox('K-Means clusterization')
+                 msgbox('K-Means clusterization');
                 
                  [labels, colors] = get_k_means_result(input_matrix, number_of_clusters);
             case 'GMM-clusters'
-                 msgbox('GMM clusterization')
+                 msgbox('GMM clusterization');
                  
-                 [labels, colors] = get_gmm_result(input_matrix, number_of_clusters)
+                 [labels, colors] = get_gmm_result(input_matrix, number_of_clusters);
             case 'Hierarchial'
-                 msgbox('Hierarchial clusterization')
+                 msgbox('Hierarchial clusterization');
                  
-                 [labels, colors] = get_hierarchial_result(input_matrix, number_of_clusters)
+                 [labels, colors] = get_hierarchial_result(input_matrix, number_of_clusters);
             end
             output_matrix = [input_matrix, labels];
             n = max(labels);
@@ -208,7 +208,7 @@ colors = []
                     check = labels == i;
                     indexcol = 1 + mod(i, 8);
                     col = colors(indexcol,:);
-                    col2 = colors(8 - indexcol + 1,:)
+                    col2 = colors(8 - indexcol + 1,:);
                     index = 1 + mod(i, 12);
                     scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
                     hold(ax2, 'on');
@@ -220,13 +220,13 @@ colors = []
                     check = labels == i;
                     indexcol = 1 + mod(i, 8);
                     col = colors(indexcol,:);
-                    col2 = colors(8 - indexcol + 1,:)
+                    col2 = colors(8 - indexcol + 1,:);
                     index = 1 + mod(i, 13);
                     scatter(ax2, output_matrix(check,1), output_matrix(check,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
                     hold(ax2, 'on');
                 end
             end
-            scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r')
+            scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r');
             hold(ax2, 'on');
         end        
     end
