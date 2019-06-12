@@ -170,13 +170,13 @@ labels = [];
         number_of_clusters = get(cluster_num_edt, 'String');
         number_of_neighbours = get(min_neigh, 'String');
         eps = get(epsilon, 'String');
-        if(strcmp(number_of_clusters, 'Enter the number of clusters') & strcmp(method{value}, 'DBSCAN') == 0)
+        if(isempty(number_of_clusters) & strcmp(method{value}, 'DBSCAN') == 0)
             msgbox('Please enter the number of clusters.', 'Error','error');
         else
             number_of_clusters = str2double(number_of_clusters);
             switch method{value} %check the method for drawing 
             case 'DBSCAN'
-                if(strcmp(number_of_neighbours, 'Enter the number of neighbours') | strcmp(eps, 'Enter the value of epsilon'))
+                if(isempty(number_of_neighbours) | isempty(eps))
                     msgbox('Please enter the values of epsilon and neighbours', 'Error','error');
                 else   
                     number_of_neighbours = str2double(number_of_neighbours);
