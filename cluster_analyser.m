@@ -192,21 +192,25 @@ labels = [];
                     labels = get_dbscan_result(input_matrix, eps, number_of_neighbours);
                     output_matrix = [input_matrix, labels];
                     draw(max(labels));
+                    summary(max(labels));
                 end 
             case 'K-Means'    
                  labels = get_k_means_result(input_matrix, number_of_clusters);
                  output_matrix = [input_matrix, labels];
                  draw(number_of_clusters);
+                 summary(number_of_clusters);
             case 'GMM-clusters'     
                  labels = get_gmm_result(input_matrix, number_of_clusters);
                  output_matrix = [input_matrix, labels];
                  draw(number_of_clusters);
+                 summary(number_of_clusters);
             case 'Hierarchial'     
                  labels = get_hierarchial_result(input_matrix, number_of_clusters);
                  output_matrix = [input_matrix, labels];
                  draw(number_of_clusters);
+                 summary(number_of_clusters);
             end         
-        end        
+        end
     end
 
     function draw(n)
@@ -224,5 +228,30 @@ labels = [];
             
             scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'b');
             hold(ax2, 'on');
+    end
+
+    %only works for already labeled data
+    function summary(n)
+        label1 = input_matrix(:,3);   
+        n1 = max(label1);
+        clust_sum = zeros(n1,1);
+        
+        for i = 1:n1
+            clust_sum(i) = sum(label1 == i);
+        end
+         
+        n1 = n;
+        clust_sum1 = zeros(n1 ,1);
+        
+        for i = 1:n1
+            clust_sum1(i) = sum(labels == i);
+        end
+        error = zeros(n1, 1);
+        
+        for i = 1:n1
+            error(i) = abs(1 - clust_sum1(i)/clust_sum(i));
+        end
+        disp(error);
+        disp(sum(error)/n1);
     end
 end
