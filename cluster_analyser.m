@@ -93,14 +93,14 @@ labels = [];
             case ".mat"
                 input_matrix = input_matrix.D; %specify matrix name that being loaded from file 
         end
-        %label = input_matrix(:,3);   
-        %n = max(label);
-        %for i = 1:n
-        %        index = 1 + mod(i, 12);
-        %        scatter(ax1, input_matrix(label == i,1), input_matrix(label == i,2), 'filled');
-        %        hold(ax1, 'on');    
-        %end
-        scatter(ax1, input_matrix(:,1), input_matrix(:,2), 'filled');
+        label = input_matrix(:,3);   
+        n = max(label);
+        for i = 1:n
+                index = 1 + mod(i, 12);
+                scatter(ax1, input_matrix(label == i,1), input_matrix(label == i,2), 'filled');
+                hold(ax1, 'on');    
+        end
+        %scatter(ax1, input_matrix(:,1), input_matrix(:,2), 'filled');
     end
     
     function fn = get_filename_for_saving()
@@ -154,9 +154,9 @@ labels = [];
                 print(graphName,'-dpng','-noui');
             otherwise
                 if(strcmp(save_selected,'Output graph'))
-                    ax = ax1;
-                else
                     ax = ax2;
+                else
+                    ax = ax1;
                 end
                 f_new = figure('Visible', 'off');
                 f_new.InvertHardcopy = 'off';
