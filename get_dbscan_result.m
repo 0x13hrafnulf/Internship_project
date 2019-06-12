@@ -1,19 +1,8 @@
-function [labels, colors] = get_dbscan_result(input_matrix, eps,  n_neigh)
+function labels = get_dbscan_result(input_matrix, eps,  n_neigh)
     
     tic
     labels = dbscan(input_matrix, eps, n_neigh);
     toc
-    
-    colors = zeros(8, 3);
-    
-    
-    for i = 1:8
-        colors(i,:) = i;
-    end
-
-    ratio = 1/8;
-    %create some random color generation
-    colors = colors * ratio;
 
     function idx = dbscan(input_matrix, epsilon, MinPts)
 

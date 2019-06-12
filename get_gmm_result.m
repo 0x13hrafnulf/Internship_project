@@ -1,4 +1,4 @@
-function [labels, colors] = get_gmm_result(input_matrix, n) 
+function labels = get_gmm_result(input_matrix, n) 
     
     options = statset('Display','final'); 
     
@@ -7,13 +7,4 @@ function [labels, colors] = get_gmm_result(input_matrix, n)
     labels = cluster(gm,input_matrix);
     toc
     
-    colors = zeros(8, 3);
-
-    for i = 1:8
-        colors(i,:) = i;
-    end
-
-    ratio = 1/8;
-    %create some random color generation
-    colors = colors * ratio;
 end
