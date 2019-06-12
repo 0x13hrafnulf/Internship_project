@@ -84,6 +84,7 @@ labels = [];
     end
 
     function open_file(src, event)
+        cla(ax1,'reset');
         [filename, pathname] = uigetfile('*.*');
         full_filename = [pathname filename];
         [pathstr, filename_for_saving, ext] = fileparts(full_filename);
@@ -92,6 +93,13 @@ labels = [];
             case ".mat"
                 input_matrix = input_matrix.D; %specify matrix name that being loaded from file 
         end
+        %label = input_matrix(:,3);   
+        %n = max(label);
+        %for i = 1:n
+        %        index = 1 + mod(i, 12);
+        %        scatter(ax1, input_matrix(label == i,1), input_matrix(label == i,2), 'filled');
+        %        hold(ax1, 'on');    
+        %end
         scatter(ax1, input_matrix(:,1), input_matrix(:,2), 'filled');
     end
     
