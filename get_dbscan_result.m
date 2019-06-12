@@ -1,8 +1,12 @@
 function [labels, colors] = get_dbscan_result(input_matrix, eps,  n_neigh)
     
+    tic
     labels = dbscan(input_matrix, eps, n_neigh);
+    toc
+    
     colors = zeros(8, 3);
-
+    
+    
     for i = 1:8
         colors(i,:) = i;
     end
