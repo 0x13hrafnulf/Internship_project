@@ -93,11 +93,16 @@ labels = [];
             case ".mat"
                 input_matrix = input_matrix.D; %specify matrix name that being loaded from file 
         end
+        marker = ['+','o','*','.','s','d','^','v','>','<','p','h'];
+        colors = ['r', 'g', 'b', 'y', 'm', 'c', 'w', 'k'];
         label = input_matrix(:,3);   
         n = max(label);
         for i = 1:n
                 index = 1 + mod(i, 12);
-                scatter(ax1, input_matrix(label == i,1), input_matrix(label == i,2), 'filled');
+                indexcol = 1 + mod(i, 8);
+                col = colors(indexcol);
+                col2 = colors(8 - indexcol + 1);
+                scatter(ax1, input_matrix(label == i,1), input_matrix(label == i,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
                 hold(ax1, 'on');    
         end
         %scatter(ax1, input_matrix(:,1), input_matrix(:,2), 'filled');
@@ -228,30 +233,5 @@ labels = [];
             
             scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'b');
             hold(ax2, 'on');
-    end
-
-    %only works for already labeled data
-    function summary(n)
-        label1 = input_matrix(:,3);   
-        n1 = max(label1);
-        clust_sum = zeros(n1,1);
-        
-        for i = 1:n1
-            clust_sum(i) = sum(label1 == i);
-        end
-         
-        n1 = n;
-        clust_sum1 = zeros(n1 ,1);
-        
-        for i = 1:n1
-            clust_sum1(i) = sum(labels == i);
-        end
-        error = zeros(n1, 1);
-        
-        for i = 1:n1
-            error(i) = abs(1 - clust_sum1(i)/clust_sum(i));
-        end
-        disp(error);
-        disp(sum(error)/n1);
     end
 end
