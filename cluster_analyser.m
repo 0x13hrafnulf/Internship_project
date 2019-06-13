@@ -234,4 +234,58 @@ labels = [];
             scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'b');
             hold(ax2, 'on');
     end
+
+    %only works for already labeled data
+    function summary(n)
+        label1 = input_matrix(:,3);   
+        n1 = max(label1);
+        clust_sum = zeros(n1,1);
+        
+        for i = 1:n1
+            clust_sum(i) = sum(label1 == i);
+        end
+        sz = size(label1,1);
+        
+        error = clust_sum;
+        n1 = n;
+        clust_sum1 = zeros(n1 ,1);
+        label_pair = zeros(n1, 2);
+        for i = 1:n1
+            clust_sum1(i) = sum(labels == i);
+        end
+        i = 1;
+        checked = false(n1,1);
+        while(i <= sz)
+            k = label1(i,1);
+            sz1 = clust_sum(k);
+            portion = labels(i:i+sz1-1,1);
+            l = mode(portion);
+            a = [k, l];
+            disp(a);
+            [C,ia,ic] = unique(portion);
+            a_counts = accumarray(ic,1);
+            value_counts = [C, a_counts];
+            disp(value_counts);
+            if(~checked(l))
+                error(k) = clust_sum(k) - clust_sum1(l);
+            else
+                error(k) = 0;
+            end
+            for m = 1:size(value_counts)
+                checked(value_counts(m)) = true;
+            end
+            %checked(l) = true;
+            i = i + sz1;
+            disp('-----');
+        end
+        
+        error1 = zeros(n1,1);
+        for k = 1:n1
+            error1(k) = abs(error(k)/clust_sum(k));
+        end
+        
+        
+        disp([clust_sum clust_sum1 error error1]);
+        disp(100*sum(error1)/n1);
+    end
 end
