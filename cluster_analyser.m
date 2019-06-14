@@ -95,17 +95,17 @@ labels = [];
         end
         marker = ['+','o','*','.','s','d','^','v','>','<','p','h'];
         colors = ['r', 'g', 'b', 'y', 'm', 'c', 'w', 'k'];
-        label = input_matrix(:,3);   
-        n = max(label);
-        for i = 1:n
-                index = 1 + mod(i, 12);
-                indexcol = 1 + mod(i, 8);
-                col = colors(indexcol);
-                col2 = colors(8 - indexcol + 1);
-                scatter(ax1, input_matrix(label == i,1), input_matrix(label == i,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
-                hold(ax1, 'on');    
-        end
-        %scatter(ax1, input_matrix(:,1), input_matrix(:,2), 'filled');
+        %label = input_matrix(:,3);   
+        %n = max(label);
+        %for i = 1:n
+                %index = 1 + mod(i, 12);
+                %indexcol = 1 + mod(i, 8);
+                %col = colors(indexcol);
+                %col2 = colors(8 - indexcol + 1);
+                %scatter(ax1, input_matrix(label == i,1), input_matrix(label == i,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
+                %hold(ax1, 'on');    
+        %end
+        scatter(ax1, input_matrix(:,1), input_matrix(:,2), 'filled');
     end
     
     function fn = get_filename_for_saving()
@@ -194,26 +194,26 @@ labels = [];
                 else   
                     number_of_neighbours = str2double(number_of_neighbours);
                     eps = str2double(eps);
-                    labels = get_dbscan_result(input_matrix, eps, number_of_neighbours);
+                    data_sz = size(input_matrix, 1);
+                    labels = get_dbscan_result(input_matrix, eps, number_of_neighbours, data_sz);
                     output_matrix = [input_matrix, labels];
                     draw(max(labels));
-                    summary(max(labels));
                 end 
             case 'K-Means'    
                  labels = get_k_means_result(input_matrix, number_of_clusters);
                  output_matrix = [input_matrix, labels];
                  draw(number_of_clusters);
-                 summary(number_of_clusters);
+                 
             case 'GMM-clusters'     
                  labels = get_gmm_result(input_matrix, number_of_clusters);
                  output_matrix = [input_matrix, labels];
                  draw(number_of_clusters);
-                 summary(number_of_clusters);
+                 
             case 'Hierarchial'     
                  labels = get_hierarchial_result(input_matrix, number_of_clusters);
                  output_matrix = [input_matrix, labels];
                  draw(number_of_clusters);
-                 summary(number_of_clusters);
+                 
             end         
         end
     end
@@ -234,58 +234,5 @@ labels = [];
             scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'b');
             hold(ax2, 'on');
     end
-
-    %only works for already labeled data
-    function summary(n)
-        label1 = input_matrix(:,3);   
-        n1 = max(label1);
-        clust_sum = zeros(n1,1);
-        
-        for i = 1:n1
-            clust_sum(i) = sum(label1 == i);
-        end
-        sz = size(label1,1);
-        
-        error = clust_sum;
-        n1 = n;
-        clust_sum1 = zeros(n1 ,1);
-        label_pair = zeros(n1, 2);
-        for i = 1:n1
-            clust_sum1(i) = sum(labels == i);
-        end
-        i = 1;
-        checked = false(n1,1);
-        while(i <= sz)
-            k = label1(i,1);
-            sz1 = clust_sum(k);
-            portion = labels(i:i+sz1-1,1);
-            l = mode(portion);
-            a = [k, l];
-            disp(a);
-            [C,ia,ic] = unique(portion);
-            a_counts = accumarray(ic,1);
-            value_counts = [C, a_counts];
-            disp(value_counts);
-            if(~checked(l))
-                error(k) = clust_sum(k) - clust_sum1(l);
-            else
-                error(k) = 0;
-            end
-            for m = 1:size(value_counts)
-                checked(value_counts(m)) = true;
-            end
-            %checked(l) = true;
-            i = i + sz1;
-            disp('-----');
-        end
-        
-        error1 = zeros(n1,1);
-        for k = 1:n1
-            error1(k) = abs(error(k)/clust_sum(k));
-        end
-        
-        
-        disp([clust_sum clust_sum1 error error1]);
-        disp(100*sum(error1)/n1);
-    end
+  
 end

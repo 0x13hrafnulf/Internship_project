@@ -1,32 +1,27 @@
-function labels = get_dbscan_result(input_matrix, eps,  n_neigh)
+function labels = get_dbscan_result(input_matrix, eps, n_neigh, data_sz)
     
     tic
     labels = dbscan(input_matrix, eps, n_neigh);
     toc
-
+    disp(data_sz);
     function idx = dbscan(input_matrix, epsilon, MinPts)
 
         cluster_n = 0;
         n = size(input_matrix,1);
         idx = zeros(n,1);
         checked = false(n,1);
-    
-        dist = pdist2(input_matrix, input_matrix, 'euclidean'); 
-    %calculate distances between each points D(i,j) => observation i in X and observation j in Y.
-    %     0      1   2 3 ...   n
-    %0 d(0,0) d(0,1)  ...    d(0,n)
-    %1 ...
-    %2 ...
-    %3 ...
-    % ...
-    %n d(n,0)     ...     d(n,n)
-    
-    
+        Dist_Tree = [];
+        if (data_sz > 10000) 
+            Dist_Tree = ExhaustiveSearcher(input_matrix(:,1:2));%KDTreeSearcher
+        else 
+            Dist_Tree = pdist2(input_matrix(:,1:2), input_matrix(:,1:2), 'euclidean');
+        end
         for i=1:n
             if (~checked(i))
                 checked(i) = true;
             
-                neighbours = RegionQuery(i); %check neighbors
+                neighbours = RegionQuery(n,i); %check neighbors
+                
                 if (numel(neighbours) < MinPts) %check whether number of neighbors fits the specified number of neighbors
                     idx(i) = 0;%means that matrix[i] is noise
                 else
@@ -45,7 +40,7 @@ function labels = get_dbscan_result(input_matrix, eps,  n_neigh)
             
                 if (~checked(j))
                     checked(j) = true;
-                    neighbours_temp = RegionQuery(j);
+                    neighbours_temp = RegionQuery(n, j);
                     if (numel(neighbours_temp) >= MinPts)
                         neighbours = [neighbours, neighbours_temp];   %append the new found neighbors
                     end
@@ -60,9 +55,16 @@ function labels = get_dbscan_result(input_matrix, eps,  n_neigh)
                 end
             end
         end
-        function neighbours = RegionQuery(i) %creates the vector of neighbors inside specified radius based on Distance matrix found by pdist2
-            neighbours = find(dist(i, :) <= epsilon);%if inside the radius
+        function neighbours = RegionQuery(n, q) %creates the vector of neighbors inside specified radius based on Distance matrix found by pdist2          
+            if(data_sz > 10000)
+                x = input_matrix(q,1:2);
+                [neighbours1, d] = rangesearch(Dist_Tree, x,epsilon);
+                neighbours = neighbours1{1};
+            else
+                neighbours = find(Dist_Tree(q, :) <= epsilon);
+            end
         end
-    end  
+          
+    end
 end
 
