@@ -228,7 +228,7 @@ labels = [];
             value = get(cluster_method_chosen, 'Value');
             
             marker = ['+','o','*','s','d','^','v','>','<','p','h'];
-            colors = ['r', 'g', 'b', 'y', 'm', 'c', 'k'];
+            colors = ['r', 'g', 'b', 'y', 'm', 'b', 'k'];
             
             [C,ia,ic] = unique(labels);
             a_counts = accumarray(ic,1);
