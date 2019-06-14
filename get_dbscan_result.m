@@ -3,7 +3,6 @@ function labels = get_dbscan_result(input_matrix, eps, n_neigh, data_sz)
     tic
     labels = dbscan(input_matrix, eps, n_neigh);
     toc
-    disp(data_sz);
     function idx = dbscan(input_matrix, epsilon, MinPts)
 
         cluster_n = 0;
@@ -13,6 +12,7 @@ function labels = get_dbscan_result(input_matrix, eps, n_neigh, data_sz)
         Dist_Tree = [];
         if (data_sz > 10000) 
             Dist_Tree = ExhaustiveSearcher(input_matrix(:,1:2));%KDTreeSearcher
+            neighbours1 = rangesearch(Dist_Tree, input_matrix(:,1:2),epsilon);
         else 
             Dist_Tree = pdist2(input_matrix(:,1:2), input_matrix(:,1:2), 'euclidean');
         end
@@ -57,9 +57,7 @@ function labels = get_dbscan_result(input_matrix, eps, n_neigh, data_sz)
         end
         function neighbours = RegionQuery(n, q) %creates the vector of neighbors inside specified radius based on Distance matrix found by pdist2          
             if(data_sz > 10000)
-                x = input_matrix(q,1:2);
-                [neighbours1, d] = rangesearch(Dist_Tree, x,epsilon);
-                neighbours = neighbours1{1};
+                neighbours = neighbours1{q};
             else
                 neighbours = find(Dist_Tree(q, :) <= epsilon);
             end

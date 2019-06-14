@@ -34,15 +34,19 @@ uicontrol('Parent', method_panel, 'Style', 'pushbutton', 'String', 'Calculate', 
 dbscan_panel = uipanel('Parent', main_window, 'Units', 'Normalized', ...
         'Position', [0.73, 0.40, 0.21, 0.3], 'Title', 'Parameters:', 'Visible', 'off');
 dbscan_s1 = uicontrol('Parent', dbscan_panel,'Style', 'text', 'String', 'Epsilon (radius)', 'Units', 'Normalized', ...
-        'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.1, 0.8, 0.8, 0.1]);
-epsilon =  uicontrol('Parent', dbscan_panel,'Style', 'edit', 'Units', 'Normalized', ...
-        'FontAngle','italic','FontSize' , 10,'Position', [0.1, 0.7, 0.8, 0.1]);
-dbscan_s2 = uicontrol('Parent', dbscan_panel,'Style', 'text', 'String', 'N-Neighbours', 'Units', 'Normalized', ...
         'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.1, 0.6, 0.8, 0.1]);
-min_neigh =  uicontrol('Parent', dbscan_panel,'Style', 'edit', 'Units', 'Normalized', ...
+epsilon =  uicontrol('Parent', dbscan_panel,'Style', 'edit', 'Units', 'Normalized', ...
         'FontAngle','italic','FontSize' , 10,'Position', [0.1, 0.5, 0.8, 0.1]);
+dbscan_s2 = uicontrol('Parent', dbscan_panel,'Style', 'text', 'String', 'N-Neighbours', 'Units', 'Normalized', ...
+        'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.1, 0.4, 0.8, 0.1]);
+min_neigh =  uicontrol('Parent', dbscan_panel,'Style', 'edit', 'Units', 'Normalized', ...
+        'FontAngle','italic','FontSize' , 10,'Position', [0.1, 0.3, 0.8, 0.1]);
 uicontrol('Parent', dbscan_panel, 'Style', 'pushbutton', 'String', 'Calculate', 'Units', 'Normalized', ...
-        'Position', [0.1, 0.2, 0.8, 0.1], 'FontWeight', 'bold' ,'FontSize' , 12, 'Callback', @calculate);
+        'Position', [0.1, 0.1, 0.8, 0.1], 'FontWeight', 'bold' ,'FontSize' , 12, 'Callback', @calculate);
+cluster_num_s1 = uicontrol('Parent', dbscan_panel, 'Style', 'text', 'String', 'N-Clusters', 'Units', 'Normalized', ...
+        'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.1, 0.8, 0.8, 0.1]);
+cluster_num_edt1 = uicontrol('Parent', dbscan_panel,'Style', 'edit', 'Units', 'Normalized', ...
+        'FontAngle','italic','FontSize' , 10,'Position', [0.1, 0.7, 0.8, 0.1]);
 %
 
     
@@ -191,13 +195,14 @@ labels = [];
             case 'DBSCAN'
                 if(isempty(number_of_neighbours) | isempty(eps))
                     msgbox('Please enter the values of epsilon and neighbours', 'Error','error');
-                else   
+                else
+                    number_of_clusters1 = str2double(get(cluster_num_edt1, 'String'));
                     number_of_neighbours = str2double(number_of_neighbours);
                     eps = str2double(eps);
                     data_sz = size(input_matrix, 1);
                     labels = get_dbscan_result(input_matrix, eps, number_of_neighbours, data_sz);
                     output_matrix = [input_matrix, labels];
-                    draw(max(labels));
+                    draw(number_of_clusters1);
                 end 
             case 'K-Means'    
                  labels = get_k_means_result(input_matrix, number_of_clusters);
@@ -219,20 +224,33 @@ labels = [];
     end
 
     function draw(n)
-            marker = ['+','o','*','.','s','d','^','v','>','<','p','h'];
-            colors = ['r', 'g', 'b', 'y', 'm', 'c', 'w', 'k'];
+            method = get(cluster_method_chosen, 'String');
+            value = get(cluster_method_chosen, 'Value');
             
-            for i = 1:n
-                    indexcol = 1 + mod(i, 8);
-                    col = colors(indexcol);
-                    col2 = colors(8 - indexcol + 1);
-                    index = 1 + mod(i, 12);
-                    scatter(ax2, output_matrix(labels == i,1), output_matrix(labels == i,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
-                    hold(ax2, 'on');    
+            marker = ['+','o','*','s','d','^','v','>','<','p','h'];
+            colors = ['r', 'g', 'b', 'y', 'm', 'c', 'k'];
+            
+            [C,ia,ic] = unique(labels);
+            a_counts = accumarray(ic,1);
+            sz = size(a_counts,1);
+            [maxes, id] = maxk(a_counts, n);
+            if(strcmp(method{value}, 'DBSCAN'))
+                id = id - 1;
             end
-            
-            scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'b');
+            for i = 1:sz
+                    if(find(id == i))
+                        indexcol = 1 + mod(i, 7);
+                        col = colors(indexcol);
+                        col2 = colors(7 - indexcol + 1);
+                        index = 1 + mod(i, 11);
+                        scatter(ax2, output_matrix(labels == i,1), output_matrix(labels == i,2), 'filled', marker(index), 'MarkerFaceColor', col, 'MarkerEdgeColor', col2);
+                        hold(ax2, 'on');
+                    else
+                        scatter(ax2, output_matrix(labels == i,1), output_matrix(labels == i,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'k');
+                        hold(ax2, 'on');
+                    end                  
+            end
+            scatter(ax2, output_matrix(labels == 0,1), output_matrix(labels == 0,2), 'filled', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'k');
             hold(ax2, 'on');
     end
-  
 end
