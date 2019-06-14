@@ -9,18 +9,15 @@ function labels = get_dbscan_result(input_matrix, eps, n_neigh, data_sz)
         n = size(input_matrix,1);
         idx = zeros(n,1);
         checked = false(n,1);
-        Dist_Tree = [];
-        if (data_sz > 10000) 
-            Dist_Tree = ExhaustiveSearcher(input_matrix(:,1:2));%KDTreeSearcher
-            neighbours1 = rangesearch(Dist_Tree, input_matrix(:,1:2),epsilon);
-        else 
-            Dist_Tree = pdist2(input_matrix(:,1:2), input_matrix(:,1:2), 'euclidean');
-        end
+
+        Dist_Tree = ExhaustiveSearcher(input_matrix(:,1:2));%KDTreeSearcher
+        neighbours1 = rangesearch(Dist_Tree, input_matrix(:,1:2),epsilon);
+
         for i=1:n
             if (~checked(i))
                 checked(i) = true;
             
-                neighbours = RegionQuery(n,i); %check neighbors
+                neighbours = RegionQuery(i); %check neighbors
                 
                 if (numel(neighbours) < MinPts) %check whether number of neighbors fits the specified number of neighbors
                     idx(i) = 0;%means that matrix[i] is noise
@@ -40,7 +37,7 @@ function labels = get_dbscan_result(input_matrix, eps, n_neigh, data_sz)
             
                 if (~checked(j))
                     checked(j) = true;
-                    neighbours_temp = RegionQuery(n, j);
+                    neighbours_temp = RegionQuery(j);
                     if (numel(neighbours_temp) >= MinPts)
                         neighbours = [neighbours, neighbours_temp];   %append the new found neighbors
                     end
@@ -55,12 +52,8 @@ function labels = get_dbscan_result(input_matrix, eps, n_neigh, data_sz)
                 end
             end
         end
-        function neighbours = RegionQuery(n, q) %creates the vector of neighbors inside specified radius based on Distance matrix found by pdist2          
-            if(data_sz > 10000)
+        function neighbours = RegionQuery(q) %creates the vector of neighbors inside specified radius based on Distance matrix found by pdist2          
                 neighbours = neighbours1{q};
-            else
-                neighbours = find(Dist_Tree(q, :) <= epsilon);
-            end
         end
           
     end
