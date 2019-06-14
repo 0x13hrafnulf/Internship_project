@@ -10,10 +10,10 @@ function labels = get_dbscan_result(input_matrix, eps, n_neigh, data_sz)
         idx = zeros(n,1);
         checked = false(n,1);
 
-        Dist_Tree = ExhaustiveSearcher(input_matrix(:,1:2));%KDTreeSearcher
+        Dist_Tree = KDTreeSearcher(input_matrix(:,1:2));%KDTreeSearcher for k < 10 / ExhaustiveSearcher for k > 10
         neighbours1 = rangesearch(Dist_Tree, input_matrix(:,1:2),epsilon);
 
-        for i=1:n
+        for i = 1:n
             if (~checked(i))
                 checked(i) = true;
             
