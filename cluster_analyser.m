@@ -17,10 +17,10 @@ save_method_chosen2 = uicontrol('Style', 'popupmenu', 'String', {'Binary (.mat)'
         'FontAngle','italic','FontSize' , 12 ,'Position', [0.84, 0.81, 0.1, 0.08]);
 uicontrol('Style', 'text', 'String', 'Clustering method', 'Units', 'Normalized', ...
         'FontWeight', 'bold' ,'FontSize' , 10,'Position', [0.73, 0.73, 0.21, 0.05]);
-cluster_method_chosen = uicontrol('Style', 'popupmenu', 'String', { 'K-Means', 'DBSCAN', 'GMM-clusters', 'Hierarchial'}, 'Units', 'Normalized', ...
+cluster_method_chosen = uicontrol('Style', 'popupmenu', 'String', { 'K-Means', 'DBSCAN', 'GMM-clusters', 'Hierarchical'}, 'Units', 'Normalized', ...
         'FontWeight','bold','FontAngle','italic','FontSize' , 11,'Position', [0.73, 0.7, 0.21, 0.05], 'Callback', @m_chosen);
     
-%Panel for k-means, hierarchial, gmm
+%Panel for k-means, hierarchical, gmm
 method_panel = uipanel('Parent', main_window, 'Units', 'Normalized', ...
         'Position', [0.73, 0.40, 0.21, 0.3], 'Title', 'Parameters:', 'Visible', 'on');
 cluster_num_s = uicontrol('Parent', method_panel, 'Style', 'text', 'String', 'N-Clusters', 'Units', 'Normalized', ...
@@ -214,8 +214,8 @@ labels = [];
                  output_matrix = [input_matrix, labels];
                  draw(number_of_clusters);
                  
-            case 'Hierarchial'     
-                 labels = get_hierarchial_result(input_matrix, number_of_clusters);
+            case 'Hierarchical'     
+                 labels = get_hierarchical_result(input_matrix, number_of_clusters);
                  output_matrix = [input_matrix, labels];
                  draw(number_of_clusters);
                  
